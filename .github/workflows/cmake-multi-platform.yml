@@ -68,12 +68,26 @@ jobs:
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
+    - name: Find executable path (Windows)
+      if: runner.os == 'Windows'
+      id: find_exe
+      shell: pwsh
+      run: |
+        $exe = Get-ChildItem -Path build -Recurse -Filter "MentalArithmeticTrainer.exe" | Select-Object -First 1
+        if ($exe) {
+          Write-Host "Found: $($exe.FullName)"
+          echo "exe_path=$($exe.FullName)" | Out-File -FilePath $env:GITHUB_OUTPUT -Append
+        } else {
+          Write-Error "No executable found"
+          exit 1
+        }
+
     - name: Upload executable (Windows)
       if: runner.os == 'Windows'
       uses: actions/upload-artifact@v6
       with:
         name: MentalArithmeticTrainer-Windows-${{ matrix.build_type }}
-        path: build/${{ matrix.build_type }}/MentalArithmeticTrainer.exe
+        path: ${{ steps.find_exe.outputs.exe_path }}
 
     - name: Upload executable (Linux)
       if: runner.os == 'Linux'
