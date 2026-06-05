@@ -11,6 +11,10 @@ configure_file(
 # 将源代码添加到此项目的可执行文件。
 add_executable (MentalArithmeticTrainer "MentalArithmeticTrainer.cpp" )
 
+if(MSVC)
+    target_compile_options(MentalArithmeticTrainer PRIVATE /utf-8)
+endif()
+
 target_include_directories(MentalArithmeticTrainer PRIVATE ${CMAKE_CURRENT_BINARY_DIR})
 
 # if (CMAKE_VERSION VERSION_GREATER 3.12)
