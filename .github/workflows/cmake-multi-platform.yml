@@ -45,7 +45,7 @@ jobs:
             c_compiler: cl
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v5
 
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
@@ -68,13 +68,19 @@ jobs:
       # Build your program with the given configuration. Note that --config is needed because the default Windows generator is a multi-config generator (Visual Studio generator).
       run: cmake --build ${{ steps.strings.outputs.build-output-dir }} --config ${{ matrix.build_type }}
 
-    - name: Upload executable
-      uses: actions/upload-artifact@v4
+    - name: Upload executable (Windows)
+      if: runner.os == 'Windows'
+      uses: actions/upload-artifact@v6
       with:
-        name: MentalArithmeticTrainer-${{ matrix.os }}-${{ matrix.build_type }}
-        path: |
-          build/MentalArithmeticTrainer.exe
-          build/MentalArithmeticTrainer
+        name: MentalArithmeticTrainer-Windows-${{ matrix.build_type }}
+        path: build/${{ matrix.build_type }}/MentalArithmeticTrainer.exe
+
+    - name: Upload executable (Linux)
+      if: runner.os == 'Linux'
+      uses: actions/upload-artifact@v6
+      with:
+        name: MentalArithmeticTrainer-Linux-${{ matrix.build_type }}
+        path: build/MentalArithmeticTrainer
 
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
